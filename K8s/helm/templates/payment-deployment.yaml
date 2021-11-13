@@ -26,7 +26,7 @@ spec:
       {{ end }}
       containers:
       - name: opa
-        image: openpolicyagent/opa:0.29.1-envoy
+        image: openpolicyagent/opa:latest-envoy
         volumeMounts:
         - readOnly: true
           mountPath: /config
