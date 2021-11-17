@@ -1,0 +1,56 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2580
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\csgray\c0;}
+\margl1440\margr1440\vieww24520\viewh15900\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf0 minikube delete\
+\
+minikube start --driver docker --memory 5943 --cpus 6\
+\
+/Users/erickao/temp/istio-1.11.4/bin/istioctl install --set profile=demo -y\
+\
+# kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/opa-envoy-plugin/main/examples/istio/quick_start.yaml\
+\
+kubectl create ns robot-shop\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural\partightenfactor0
+\cf0 \
+# kubectl label namespace default opa-istio-injection="enabled"\
+# kubectl label namespaces default istio-injection=enabled\
+kubectl label namespace robot-shop opa-istio-injection="enabled"\
+kubectl label namespaces robot-shop istio-injection=enabled\
+\
+kubectl apply -f /Users/erickao/temp/istio-1.11.4/samples/addons\
+kubectl rollout status deployment/kiali -n istio-system\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 /Users/erickao/temp/istio-1.11.4/bin/istioctl dashboard kiali\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural\partightenfactor0
+
+\f1 \cf2 \CocoaLigature0 minikube dashboard
+\f0 \cf0 \CocoaLigature1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural\partightenfactor0
+\cf0 \
+curl -H 'Authorization: Bearer jMxfQ4Rvnec-m-vJupO3ce5QvN0TWQ7MLqVqa-H8sJcQOLNXe5kgfZpkzvlvS3FwOvdfh5kkaUexIE47zgodP4-jD3cFEdmA05xhGA' https://test.styra.com/v1/systems/c806f4a3814749cc8f2835282e979026/assets/envoyfilter.yaml | kubectl -n robot-shop apply -f -\
+\
+curl -H 'Authorization: Bearer jMxfQ4Rvnec-m-vJupO3ce5QvN0TWQ7MLqVqa-H8sJcQOLNXe5kgfZpkzvlvS3FwOvdfh5kkaUexIE47zgodP4-jD3cFEdmA05xhGA' https://test.styra.com/v1/systems/c806f4a3814749cc8f2835282e979026/assets/opaconfig.yaml | kubectl -n robot-shop apply -f -\
+\
+curl -H 'Authorization: Bearer jMxfQ4Rvnec-m-vJupO3ce5QvN0TWQ7MLqVqa-H8sJcQOLNXe5kgfZpkzvlvS3FwOvdfh5kkaUexIE47zgodP4-jD3cFEdmA05xhGA' https://test.styra.com/v1/systems/c806f4a3814749cc8f2835282e979026/assets/slp.yaml | kubectl -n robot-shop apply -f -\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardeftab720\pardirnatural\partightenfactor0
+\cf0 helm install robot-shop --namespace robot-shop /Users/erickao/workspace/robot-shop/K8s/helm\
+\
+kubectl -n robot-shop apply -f /Users/erickao/workspace/robot-shop/K8s/Istio/gateway.yaml\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardeftab720\pardirnatural\partightenfactor0
+
+\f1 \cf2 \CocoaLigature0 helm --namespace robot-shop uninstall robot-shop\
+\
+kubectl -n robot-shop apply -f 
+\f0 \cf0 \CocoaLigature1 /Users/erickao/workspace/robot-shop/
+\f1 \cf2 \CocoaLigature0 K8s/load-deployment.yaml\
+}

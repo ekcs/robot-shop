@@ -1,0 +1,144 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: example-app
+  labels:
+    app: example-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+    spec:
+      containers:
+        - name: app
+          image: openpolicyagent/demo-restful-api:0.2
+          ports:
+            - containerPort: 5000
+          env:
+          - name: POLICY_PATH
+            value:  /v1/data/application/main
+        - name: opa
+          image: openpolicyagent/opa:0.29.1-envoy
+          volumeMounts:
+          - readOnly: true
+            mountPath: /config
+            name: opa-config-vol
+          livenessProbe:
+            httpGet:
+              path: /health
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5      # Tune these periods for your environemnt
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?bundle=true  # Include bundle activation in readiness
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          args:
+          - "run"
+          - "--server"
+          - "--ignore=.*"
+          - "--config-file=/config/conf.yaml"
+          - "--authorization=basic"
+          - "--addr=http://127.0.0.1:8181"
+          - "--diagnostic-addr=0.0.0.0:8282"
+      volumes:
+      - name: opa-config-vol
+        configMap:
+          name: opa-istio-config
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-app-service
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: example-app
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-load
+  labels:
+    app: client-load
+    system-type: istio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-load
+      system-type: istio
+  template:
+    metadata:
+      labels:
+        app: client-load
+        system-type: istio
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -ec
+        - sleep 30; while true; do
+          curl -is --user alice:password ${EXAMPLE_APP_SVC}/finance/salary/alice;
+          curl -is --user bob:password ${EXAMPLE_APP_SVC}/finance/salary/alice;
+          curl -is --user bob:password ${EXAMPLE_APP_SVC}/finance/salary/charlie;
+          curl -is --user david:password ${EXAMPLE_APP_SVC}/finance/salary/bob;
+          curl -is --user david:password ${EXAMPLE_APP_SVC}/hr/dashboard;
+          curl -is --user eve:password ${EXAMPLE_APP_SVC}/admin;
+          curl -is httpbin.org/anything;
+          sleep 30; done
+        image: "curlimages/curl:7.74.0"
+        imagePullPolicy: IfNotPresent
+        name: app
+        env:
+        - name: EXAMPLE_APP_SVC
+          value: example-app-service
+      - name: opa
+        image: openpolicyagent/opa:0.29.1-envoy
+        volumeMounts:
+        - readOnly: true
+          mountPath: /config
+          name: opa-config-vol
+        livenessProbe:
+            httpGet:
+              path: /health
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5    # Tune these periods for your environemnt
+            periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health?bundle=true # Include bundle activation in readiness
+            scheme: HTTP
+            port: 8282
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        args:
+          - "run"
+          - "--server"
+          - "--ignore=.*"
+          - "--config-file=/config/conf.yaml"
+          - "--authorization=basic"
+          - "--addr=http://127.0.0.1:8181"
+          - "--diagnostic-addr=0.0.0.0:8282"
+      volumes:
+      - name: opa-config-vol
+        configMap:
+          name: opa-istio-config
