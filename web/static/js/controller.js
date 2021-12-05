@@ -226,6 +226,9 @@
                 $timeout(clearMessage, 3000);
                 loadRating($scope.data.product.sku);
             }).catch((e) => {
+                $scope.data.message = 'Please sign-in before rating a product. Thank you!';
+                $timeout(clearMessage, 3000);
+                loadRating($scope.data.product.sku);
                 console.log('ERROR', e);
             });
         };
