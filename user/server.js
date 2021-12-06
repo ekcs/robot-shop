@@ -1,4 +1,5 @@
 const instana = require('@instana/collector');
+const jwt = require('jsonwebtoken');
 // init tracing
 // MUST be done before loading anything else!
 instana({
@@ -127,6 +128,11 @@ app.post('/login', (req, res) => {
             req.log.info('user', user);
             if(user) {
                 if(user.password == req.body.password) {
+                    // generate jwt
+                    // FIXME remove private key from source code
+                    token_payload = {"sub": user.name, "roles": ["shopper"]};
+                    // user.token = jwt.sign(token_payload, "", { expiresIn: '1800s' });
+                    user.token = token_payload  // temp store the payload directly
                     res.json(user);
                 } else {
                     res.status(404).send('incorrect password');

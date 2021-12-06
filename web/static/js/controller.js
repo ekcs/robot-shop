@@ -220,14 +220,15 @@
             var url = '/api/ratings/api/rate/' + $scope.data.product.sku + '/' + score;
             $http({
                 url: url,
-                method: 'PUT'
+                method: 'PUT',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.message = 'Thank you for your feedback';
                 $timeout(clearMessage, 3000);
                 loadRating($scope.data.product.sku);
             }).catch((e) => {
                 $scope.data.message = 'Please sign-in before rating a product. Thank you!';
-                $timeout(clearMessage, 3000);
+                $timeout(clearMessage, 10000);
                 loadRating($scope.data.product.sku);
                 console.log('ERROR', e);
             });
