@@ -54,4 +54,12 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
+        # fixme remove these dev-time only temporary things
+        command: ["/bin/sh", "-c"]
+        args:
+          - echo starting;
+            npm install nodemon --global;
+            npm install jsonwebtoken --global;
+            nodemon server.js;
+            apt install vim;
       restartPolicy: Always
