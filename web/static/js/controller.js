@@ -38,6 +38,9 @@
         }).when('/payment', {
             templateUrl: 'payment.html',
             controller: 'paymentform'
+        }).when('/accounts', {
+            templateUrl: 'search.html',
+            controller: 'accountsform'
         }).otherwise({
             redirectTo: '/'
         });
@@ -62,6 +65,27 @@
                 ineum('page', next.loadedTemplateUrl);
             }
         });
+    });
+
+    robotshop.controller('accountsform', function($scope, $http, $routeParams) {
+        $scope.data = {};
+        $scope.data.searchResults = [];
+
+        function loadUsers() {
+            $http({
+                url: '/api/user/users',
+                method: 'GET'
+            }).then((res) => {
+                console.log('search results', res.data);
+                $scope.data.searchResults = res.data;
+            }).catch((e) => {
+                console.log('ERROR', e);
+            });
+        }
+
+        var text = $routeParams.text;
+        console.log('search init with', text);
+        loadUsers();
     });
 
     robotshop.controller('shopform', function($scope, $http, $location, currentUser) {
