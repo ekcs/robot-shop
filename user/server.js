@@ -121,33 +121,56 @@ app.post('/login', (req, res) => {
     if(req.body.name === undefined || req.body.password === undefined) {
         req.log.warn('credentails not complete');
         res.status(400).send('name or passowrd not supplied');
-    } else if(mongoConnected) {
-        usersCollection.findOne({
-            name: req.body.name,
-        }).then((user) => {
-            req.log.info('user', user);
-            if(user) {
-                if(user.password == req.body.password) {
-                    // generate jwt
-                    // FIXME remove private key from source code
-                    token_payload = {"sub": user.name, "roles": ["shopper"]};
-                    // user.token = jwt.sign(token_payload, "", { expiresIn: '1800s' });
-                    user.token = token_payload  // temp store the payload directly
-                    res.json(user);
-                } else {
-                    res.status(404).send('incorrect password');
-                }
-            } else {
-                res.status(404).send('name not found');
-            }
-        }).catch((e) => {
-            req.log.error('ERROR', e);
-            res.status(500).send(e);
-        });
     } else {
-        req.log.error('database not available');
-        res.status(500).send('database not available');
+        user = {"password": ""};
+        if(req.body.name == "alice") {
+            user["name"] = "alice";
+            user["email"] = "alice@customer.com";
+            token_payload = {"sub": user.name, "roles": ["shopper"]};
+        } else if (req.body.name == "eve") {
+            user["name"] = "eve";
+            user["email"] = "eve@customer.com";
+            token_payload = {"sub": user.name, "roles": ["shopper"]};
+        } else if (req.body.name == "csr-1") {
+            user["name"] = "csr-1";
+            user["email"] = "csr-1@shop.com";
+            token_payload = {"sub": user.name, "roles": ["customer-service"]};
+        } else if (req.body.name == "devop-1") {
+            user["name"] = "devop-1";
+            user["email"] = "devop-1@shop.com";
+            token_payload = {"sub": user.name, "roles": ["devop"]};
+        }
+        user.token = token_payload  // temp store the payload directly
+        res.json(user);
     }
+            // user.token = jwt.sign(token_payload, "", { expiresIn: '1800s' });
+    // if(mongoConnected) {
+    //     usersCollection.findOne({
+    //         name: req.body.name,
+    //     }).then((user) => {
+    //         req.log.info('user', user);
+    //         if(user) {
+    //             if(user.password == req.body.password) {
+    //                 // generate jwt
+    //                 // FIXME remove private key from source code
+    //                 token_payload = {"sub": user.name, "roles": ["shopper"]};
+    //                 // user.token = jwt.sign(token_payload, "", { expiresIn: '1800s' });
+    //                 user.token = token_payload  // temp store the payload directly
+    //                 res.json(user);
+    //             } else {
+    //                 res.status(404).send('incorrect password');
+    //             }
+    //         } else {
+    //             res.status(404).send('name not found');
+    //         }
+    //     }).catch((e) => {
+    //         req.log.error('ERROR', e);
+    //         res.status(500).send(e);
+    //     });
+    // } else {
+    //     req.log.error('database not available');
+    //     res.status(500).send('database not available');
+    // }
 });
 
 // TODO - validate email address format
