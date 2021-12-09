@@ -67,7 +67,7 @@
         });
     });
 
-    robotshop.controller('accountsform', function($scope, $http, $routeParams) {
+    robotshop.controller('accountsform', function($scope, $http, $routeParams, currentUser) {
         $scope.data = {};
         $scope.data.searchResults = [];
 
