@@ -162,6 +162,7 @@
                 currentUser.uniqueid = id;
                 console.assert(!("user" in currentUser), "unexpected user at init");
                 currentUser["user"] = {"token": {"sub": currentUser.uniqueid, "roles": []}};
+                $scope.data.user = currentUser.user;
                 // update metadata
                 if(typeof ineum !== 'undefined') {
                     ineum('user', id);
