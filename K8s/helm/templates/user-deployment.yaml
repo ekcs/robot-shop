@@ -397,15 +397,14 @@ spec:
             memory: 50Mi
         volumeMounts:
         - readOnly: false
-          mountPath: /opt/server/server.json
+          mountPath: /opt/server/server.js
           name: user-service-code-revision-mount
-          subPath: server.json
+          subPath: server.js
         # fixme remove these dev-time only temporary things
         command: ["/bin/sh", "-c"]
         args:
           - echo starting;
             npm install nodemon --global;
-            npm install jsonwebtoken --global;
+            npm install jsonwebtoken;
             nodemon server.js;
-            apt install vim;
       restartPolicy: Always
