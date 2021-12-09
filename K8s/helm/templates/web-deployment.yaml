@@ -166,7 +166,7 @@ data:
                 getUniqueid().then((id) => {
                     $scope.data.uniqueid = id;
                     currentUser.uniqueid = id;
-                    console.assert(!("user" in currentUser), "unexpected user at init");
+                    console.assert(("user" in currentUser), "user field not exist: " + JSON.stringify(currentUser));
                     currentUser["user"] = {"token": {"sub": currentUser.uniqueid, "roles": []}};
                     $scope.data.user = currentUser.user;
                     // update metadata
