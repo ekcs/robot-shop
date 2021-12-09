@@ -74,7 +74,8 @@
         function loadUsers() {
             $http({
                 url: '/api/user/users',
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 console.log('search results', res.data);
                 $scope.data.searchResults = res.data;
@@ -106,7 +107,8 @@
             } else {
                 $http({
                     url: '/api/catalogue/products/' + category,
-                    method: 'GET'
+                    method: 'GET',
+                    headers: {'authorization': JSON.stringify(currentUser.user.token)}
                 }).then((res) => {
                     $scope.data.products[category] = res.data;
                 }).catch((e) => {
@@ -125,7 +127,8 @@
         function getCategories() {
             $http({
                 url: '/api/catalogue/categories',
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.categories = res.data;
                 console.log('categories loaded');
@@ -157,6 +160,8 @@
             getUniqueid().then((id) => {
                 $scope.data.uniqueid = id;
                 currentUser.uniqueid = id;
+                console.assert(!("user" in currentUser), "unexpected user at init");
+                currentUser["user"] = {"token": {"sub": currentUser.uniqueid, "roles": []}};
                 // update metadata
                 if(typeof ineum !== 'undefined') {
                     ineum('user', id);
@@ -226,7 +231,8 @@
             console.log('addToCart', url);
             $http({
                 url: url,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 console.log('cart', res.data);
                 currentUser.cart = res.data;
@@ -270,7 +276,8 @@
         function loadProduct(sku) {
             $http({
                 url: '/api/catalogue/product/' + sku,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.product = res.data;
             }).catch((e) => {
@@ -281,7 +288,8 @@
         function loadRating(sku) {
             $http({
                 url: '/api/ratings/api/fetch/' + sku,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.rating = res.data;
             }).catch((e) => {
@@ -314,7 +322,8 @@
             console.log('change', url);
             $http({
                 url: url,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.cart = res.data;
                 currentUser.cart = res.data;
@@ -326,14 +335,16 @@
         function loadCart(id) {
             $http({
                 url: '/api/cart/cart/' + id,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 var cart = res.data;
                 // remove shipping - last item in cart
                 if(cart.items[cart.items.length - 1].sku == 'SHIP') {
                     $http({
                         url: '/api/cart/update/' + id + '/SHIP/0',
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {'authorization': JSON.stringify(currentUser.user.token)}
                     }).then((res) => {
                         currentUser.cart = res.data;
                         $scope.data.cart = res.data;
@@ -365,7 +376,8 @@
             console.log('calc uuid', uuid);
             $http({
                 url: '/api/shipping/calc/' + uuid,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 console.log('shipping data', res.data);
                 $scope.data.shipping = res.data;
@@ -380,7 +392,8 @@
             $http({
                 url: '/api/shipping/confirm/' + currentUser.uniqueid,
                 method: 'POST',
-                data: $scope.data.shipping
+                data: $scope.data.shipping,
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 // go to final confirmation
                 console.log('confirm cart', res.data);
@@ -409,7 +422,8 @@
         function loadCodes() {
             $http({
                 url: '/api/shipping/codes',
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.countries = res.data;
             }).catch((e) => {
@@ -425,7 +439,8 @@
                     $scope.data.disableCalc = true;
                     $http({
                         url: '/api/shipping/match/' + $scope.data.selectedCountry.code + '/' + term,
-                        method: 'GET'
+                        method: 'GET',
+                        headers: {'authorization': JSON.stringify(currentUser.user.token)}
                     }).then((res) => {
                         console.log('suggest', res.data);
                         suggest(res.data);
@@ -467,7 +482,8 @@
             $http({
                 url: '/api/payment/pay/' + $scope.data.uniqueid,
                 method: 'POST',
-                data: $scope.data.cart
+                data: $scope.data.cart,
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 console.log('order', res.data);
                 $scope.data.message = 'Order placed ' + res.data.orderid;
@@ -505,7 +521,8 @@
                 data: {
                     name: $scope.data.name,
                     password: $scope.data.password
-                }
+                },
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 var oldId = currentUser.uniqueid;
                 $scope.data.user = res.data;
@@ -516,7 +533,8 @@
                 // login OK move cart across
                 $http({
                     url: '/api/cart/rename/' + oldId + '/' + $scope.data.user.name,
-                    method: 'GET'
+                    method: 'GET',
+                    headers: {'authorization': JSON.stringify(currentUser.user.token)}
                 }).then((res) => {
                     console.log('cart moved OK');
                 }).catch((e) => {
@@ -552,7 +570,8 @@
                     name: $scope.data.name,
                     email: $scope.data.email,
                     password: $scope.data.password
-                }
+                },
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 $scope.data.user = {
                     name: $scope.data.name,
@@ -571,7 +590,8 @@
         function loadHistory(id) {
             $http({
                 url: '/api/user/history/' + id,
-                method: 'GET'
+                method: 'GET',
+                headers: {'authorization': JSON.stringify(currentUser.user.token)}
             }).then((res) => {
                 console.log('history', res.data);
                 $scope.data.orderHistory = res.data.history;
