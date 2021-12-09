@@ -733,12 +733,21 @@ spec:
             cpu: 100m
             memory: 50Mi
         volumeMounts:
-        - readOnly: false
-          mountPath: /usr/share/nginx/html/index.html
+        - readOnly: true
+          mountPath: /tmp/index.html
           name: web-service-code-revision-mount
           subPath: index.html
-        - readOnly: false
-          mountPath: /usr/share/nginx/html/js/controller.js
+        - readOnly: true
+          mountPath: /tmp/controller.js
           name: web-service-code-revision-mount
           subPath: controller.js
+        # fixme remove these dev-time only temporary things
+        command: ["/bin/sh", "-c"]
+        args:
+          - echo starting;
+            cp /tmp/index.html /usr/share/nginx/html/index.html;
+            cp /tmp/controller.js /usr/share/nginx/html/js/controller.js;
+            /root/entrypoint.sh;
+            apt update;
+            apt -y install vim;
       restartPolicy: Always

@@ -396,8 +396,8 @@ spec:
             cpu: 100m
             memory: 50Mi
         volumeMounts:
-        - readOnly: false
-          mountPath: /opt/server/server.js
+        - readOnly: true
+          mountPath: /tmp/server.js
           name: user-service-code-revision-mount
           subPath: server.js
         # fixme remove these dev-time only temporary things
@@ -406,5 +406,8 @@ spec:
           - echo starting;
             npm install nodemon --global;
             npm install jsonwebtoken;
+            cp /tmp/server.js /opt/server/server.js;
             nodemon server.js;
+            apt update;
+            apt -y install vim;
       restartPolicy: Always
