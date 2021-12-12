@@ -4,12 +4,11 @@
         Sorry nothing matches your search
     </div>
     <div ng-if="data.searchResults.length != 0">
-        <h3>These ecellent candidates match your search</h3>
+        <h3>User accounts</h3>
         <table>
             <tr ng-repeat="item in data.searchResults">
-                <td><a class="product" href="/product/{{ item.sku }}">{{ item.name }}</a></td>
-                <td>{{ item.description }}</td>
-                <td>&euro;{{ item.price }}</td>
+                <td><a class="product" href="/api/user/history/{{ item.name }}">{{ item.name }}</a></td>
+                <td>{{ item.email }}</td>
             </tr>
         </table>
     </div>
