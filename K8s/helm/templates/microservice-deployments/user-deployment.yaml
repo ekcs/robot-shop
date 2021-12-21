@@ -336,6 +336,13 @@ data:
         logger.info('Started on port', port);
     });
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: user-svc
+  labels:
+    account: user-svc
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -359,9 +366,7 @@ spec:
       - name: user-service-code-revision-mount
         configMap:
           name: user-service-code-revision
-      {{ if .Values.psp.enabled }}
-      serviceAccountName: robot-shop
-      {{ end }}
+      serviceAccountName: user-svc
       containers:
       - name: opa
         image: openpolicyagent/opa:latest-envoy

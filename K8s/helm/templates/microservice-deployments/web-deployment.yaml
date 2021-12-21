@@ -694,6 +694,13 @@ data:
     </body>
     </html>
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web-svc
+  labels:
+    account: web-svc
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -710,6 +717,7 @@ spec:
       labels:
         service: web
     spec:
+      serviceAccountName: web-svc
       volumes:
       - name: opa-config-vol
         configMap:
@@ -721,20 +729,20 @@ spec:
       serviceAccountName: robot-shop
       {{ end }}
       containers:
-      # - name: opa
-      #   image: openpolicyagent/opa:latest-envoy
-      #   volumeMounts:
-      #   - readOnly: true
-      #     mountPath: /config
-      #     name: opa-config-vol
-      #   args:
-      #   - "run"
-      #   - "--server"
-      #   - "--ignore=.*"
-      #   - "--config-file=/config/conf.yaml"
-      #   - "--authorization=basic"
-      #   - "--addr=http://127.0.0.1:8181"
-      #   - "--diagnostic-addr=0.0.0.0:8282"
+      - name: opa
+        image: openpolicyagent/opa:latest-envoy
+        volumeMounts:
+        - readOnly: true
+          mountPath: /config
+          name: opa-config-vol
+        args:
+        - "run"
+        - "--server"
+        - "--ignore=.*"
+        - "--config-file=/config/conf.yaml"
+        - "--authorization=basic"
+        - "--addr=http://127.0.0.1:8181"
+        - "--diagnostic-addr=0.0.0.0:8282"
       - name: web
         image: {{ .Values.image.repo }}/rs-web:{{ .Values.image.version }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

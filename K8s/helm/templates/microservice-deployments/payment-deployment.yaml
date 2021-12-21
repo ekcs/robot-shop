@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payment-svc
+  labels:
+    account: payment-svc
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,6 +24,7 @@ spec:
         service: payment
         stage: prod
     spec:
+      serviceAccountName: payment-svc
       volumes:
       - name: opa-config-vol
         configMap:
